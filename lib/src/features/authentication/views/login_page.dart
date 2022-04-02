@@ -3,14 +3,78 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   LoginPage({Key? key}) : super(key: key);
+
+  @override
+  LoginPageState createState() => LoginPageState();
+}
+
+class LoginPageState extends ConsumerState<LoginPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool errorOnEmail = false;
+  bool errorOnPassword = false;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    // "ref" se puede utilizar en todos lo ciclos de vida de un StatefulWidget.
+    ref.read(authNotifierProvider);
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  String? get _errorTextEmail {
+    final text = nameController.value.text;
+    if (text.isEmpty) {
+      setState(() {
+        errorOnEmail = true;
+      });
+      return 'No puede estar vacía';
+    }
+    if (text.length < 4) {
+      setState(() {
+        errorOnEmail = true;
+      });
+      return 'Muy pequeña';
+    }
+    setState(() {
+      errorOnEmail = false;
+    });
+    return null;
+  }
+
+  String? get _errorTextPass {
+    final text = passwordController.value.text;
+    if (text.isEmpty) {
+      setState(() {
+        errorOnPassword = true;
+      });
+      return 'No puede estar vacía';
+    }
+    if (text.length < 4) {
+      setState(() {
+        errorOnPassword = true;
+      });
+      return 'Muy pequeña';
+    }
+    setState(() {
+      errorOnPassword = false;
+    });
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(systemNavigationBarColor: Colors.white));
+        const SystemUiOverlayStyle(systemNavigationBarColor: Colors.white));
+    // También podemos usar "ref" para escuchar a un provider dentro del método build
     final state = ref.watch(authNotifierProvider);
 
     return Scaffold(
@@ -28,7 +92,7 @@ class LoginPage extends ConsumerWidget {
                           fontWeight: FontWeight.w500,
                           fontSize: 20),
                     )),
-                Container(
+                SizedBox(
                   height: 140,
                   child: Center(
                     child: Image.asset("assets/images/21shots.png"),
@@ -45,10 +109,11 @@ class LoginPage extends ConsumerWidget {
                   padding: const EdgeInsets.all(10),
                   child: TextField(
                     controller: nameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Correo',
-                    ),
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: 'Correo',
+                        errorText: _errorTextEmail),
+                    onChanged: (text) => setState(() {}),
                   ),
                 ),
                 Container(
@@ -56,20 +121,13 @@ class LoginPage extends ConsumerWidget {
                   child: TextField(
                     obscureText: true,
                     controller: passwordController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Contraseña',
-                    ),
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: 'Contraseña',
+                        errorText: _errorTextPass),
+                    onChanged: (text) => setState(() {}),
                   ),
                 ),
-                // TextButton(
-                //   onPressed: () {
-                //     //forgot password screen
-                //   },
-                //   child: const Text(
-                //     'Forgot Password',
-                //   ),
-                // ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: Container(
@@ -86,8 +144,8 @@ class LoginPage extends ConsumerWidget {
                             data: (data) => Text("Entrar"),
                             error: (error) => Text("Entrar")),
                         onPressed: !state.isLoading &&
-                                nameController.text != "" &&
-                                passwordController.text != ""
+                                !errorOnPassword &&
+                                !errorOnEmail
                             ? () {
                                 ref.read(authNotifierProvider.notifier).login(
                                     nameController.text,
@@ -97,21 +155,6 @@ class LoginPage extends ConsumerWidget {
                             : null,
                       )),
                 ),
-                // Row(
-                //   children: <Widget>[
-                //     const Text('Does not have account?'),
-                //     TextButton(
-                //       child: const Text(
-                //         'Sign in',
-                //         style: TextStyle(fontSize: 20),
-                //       ),
-                //       onPressed: () {
-                //         //signup screen
-                //       },
-                //     )
-                //   ],
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                // ),
               ],
             )));
   }
