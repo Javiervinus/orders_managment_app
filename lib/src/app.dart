@@ -8,8 +8,8 @@ class OrderApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(systemNavigationBarColor: Colors.white));
+    // SystemChrome.setSystemUIOverlayStyle(
+    //     SystemUiOverlayStyle(systemNavigationBarColor: Colors.white));
 
     return MaterialApp.router(
         debugShowCheckedModeBanner: false,

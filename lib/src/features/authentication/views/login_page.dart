@@ -72,8 +72,6 @@ class LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(systemNavigationBarColor: Colors.white));
     // También podemos usar "ref" para escuchar a un provider dentro del método build
     final state = ref.watch(authNotifierProvider);
 
