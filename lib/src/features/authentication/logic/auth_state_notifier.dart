@@ -17,7 +17,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState.data(user: user);
       FocusManager.instance.primaryFocus?.unfocus();
       saveStorage(user);
-      AutoRouter.of(context).pushWidget(SelectUserPage(),
+      AutoRouter.of(context).pushWidget(const SelectUserPage(),
           transitionBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;
@@ -30,7 +30,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           position: animation.drive(tween),
           child: child,
         );
-      }, transitionDuration: Duration(milliseconds: 470));
+      }, transitionDuration: const Duration(milliseconds: 370));
     } catch (_) {
       state = const AuthState.error("Error al iniciar sesion");
       ScaffoldMessenger.of(context)
@@ -44,7 +44,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (_authRepository.logOut()) {
       prefs.remove("user");
       state = const AuthState.initial();
-      // AutoRouter.of(context).replace(const LoginRouter());
+      AutoRouter.of(context).replace(LoginRouter());
     }
   }
 
@@ -64,6 +64,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final str = jsonEncode(user.toJson());
     prefs.setString("user", str);
+  }
+
+  selectTypeUser(bool? isWaiter, BuildContext context) {
+    user()?.isWaiter = isWaiter;
+    saveStorage(user()!);
+    state = AuthState.data(user: user()!);
+    AutoRouter.of(context).replace(TabsAppRouter());
   }
 
   UserModel? user() {

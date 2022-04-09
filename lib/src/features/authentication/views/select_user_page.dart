@@ -35,94 +35,133 @@ class SelectUserPage extends ConsumerWidget {
                   flex: 9,
                   child: Column(
                     children: [
-                      state.mapOrNull(data: (value) => value.user.waiter) !=
-                              null
-                          ? Card(
-                              color: Colors.yellow,
-                              margin: const EdgeInsets.all(20),
-                              elevation: 5,
-                              child: Container(
-                                  width: 180,
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(
-                                    children: const [
-                                      Icon(Icons.person),
-                                      Expanded(
-                                        child: Center(
-                                          child: Text(
-                                            "Mesero",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                      if (state.mapOrNull(data: (value) => value.user.waiter) !=
+                          null)
+                        Card(
+                          color: Colors.yellow,
+                          margin: const EdgeInsets.all(20),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: () {
+                              ref
+                                  .read(authNotifierProvider.notifier)
+                                  .selectTypeUser(true, context);
+                            },
+                            child: Container(
+                                width: 180,
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.person),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          "Mesero",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                    ],
-                                  )),
-                            )
-                          : const Text(""),
-                      state.mapOrNull(data: (value) => value.user.chef) != null
-                          ? Card(
-                              color: Colors.redAccent,
-                              margin: const EdgeInsets.all(20),
-                              elevation: 5,
-                              child: Container(
-                                  width: 180,
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(
-                                    children: const [
-                                      Icon(
-                                        Icons.fastfood,
-                                        color: Colors.white,
-                                      ),
-                                      Expanded(
-                                        child: Center(
-                                          child: Text(
-                                            "Chef",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        )
+                      else
+                        const Text(""),
+                      if (state.mapOrNull(data: (value) => value.user.chef) !=
+                          null)
+                        Card(
+                          color: Colors.redAccent,
+                          margin: const EdgeInsets.all(20),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: () {
+                              ref
+                                  .read(authNotifierProvider.notifier)
+                                  .selectTypeUser(false, context);
+                            },
+                            child: Container(
+                                width: 180,
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.fastfood,
+                                      color: Colors.white,
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          "Chef",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                    ],
-                                  )),
-                            )
-                          : const Text(""),
-                      state.mapOrNull(data: (value) => value.user.isAdmin) ==
-                              true
-                          ? Card(
-                              color: Colors.lightBlue,
-                              margin: const EdgeInsets.all(20),
-                              elevation: 5,
-                              child: Container(
-                                  width: 180,
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(
-                                    children: const [
-                                      Icon(
-                                        Icons.admin_panel_settings,
-                                        color: Colors.white,
-                                      ),
-                                      Expanded(
-                                        child: Center(
-                                          child: Text(
-                                            "Admin",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        )
+                      else
+                        const Text(""),
+                      if (state.mapOrNull(
+                              data: (value) => value.user.isAdmin) ==
+                          true)
+                        Card(
+                          color: Colors.lightBlue,
+                          margin: const EdgeInsets.all(20),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: () {
+                              ref
+                                  .read(authNotifierProvider.notifier)
+                                  .selectTypeUser(null, context);
+                            },
+                            child: Container(
+                                width: 180,
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.admin_panel_settings,
+                                      color: Colors.white,
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          "Admin",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                    ],
-                                  )),
-                            )
-                          : const Text(""),
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        )
+                      else
+                        const Text(""),
                     ],
-                  ))
+                  )),
+              state.mapOrNull(
+                    data: (value) {
+                      if (value.user.isWaiter == null) {
+                        return const Text("es admin");
+                      }
+                      if (value.user.isWaiter == true) {
+                        return const Text("Es mesero");
+                      } else {
+                        return const Text("Es chef");
+                      }
+                    },
+                  ) ??
+                  const Text("")
             ],
           ),
         ),

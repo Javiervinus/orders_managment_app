@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
+    nameController.text = "javiervin@hotmail.com";
+    passwordController.text = "Hola123";
+
     // "ref" se puede utilizar en todos lo ciclos de vida de un StatefulWidget.
     ref.read(authNotifierProvider);
   }
@@ -134,13 +138,13 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(primary: Colors.black),
                         child: state.when(
-                            initial: () => Text("Entrar"),
+                            initial: () => const Text("Entrar"),
                             loading: () => const Center(
                                     child: CircularProgressIndicator(
                                   color: Colors.white,
                                 )),
-                            data: (data) => Text("Entrar"),
-                            error: (error) => Text("Entrar")),
+                            data: (data) => const Text("Entrar"),
+                            error: (error) => const Text("Entrar")),
                         onPressed: !state.isLoading &&
                                 !errorOnPassword &&
                                 !errorOnEmail
