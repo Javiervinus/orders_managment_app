@@ -15,8 +15,8 @@ import 'package:flutter/material.dart' as _i8;
 
 import '../features/authentication/views/login_page.dart' as _i3;
 import '../features/authentication/views/select_user_page.dart' as _i4;
+import '../features/tableManagment/views/table_page.dart' as _i7;
 import '../screens/orders_page.dart' as _i5;
-import '../screens/table_page.dart' as _i7;
 import '../screens/test_page.dart' as _i6;
 import '../tab_page.dart' as _i2;
 import 'guards/auth_guard.dart' as _i9;
@@ -72,10 +72,8 @@ class AppRouter extends _i1.RootStackRouter {
           routeData: routeData, child: const _i6.TestPage());
     },
     TableRoute.name: (routeData) {
-      final args = routeData.argsAs<TableRouteArgs>(
-          orElse: () => const TableRouteArgs());
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i7.TablePage(key: args.key));
+          routeData: routeData, child: const _i7.TablePage());
     }
   };
 
@@ -114,7 +112,9 @@ class AppRouter extends _i1.RootStackRouter {
                     parent: TabsAppRouter.name,
                     children: [
                       _i1.RouteConfig(TableRoute.name,
-                          path: '', parent: TablesRouter.name)
+                          path: '', parent: TablesRouter.name),
+                      _i1.RouteConfig(TestRoute.name,
+                          path: 'test', parent: TablesRouter.name)
                     ])
               ])
         ])
@@ -224,20 +224,8 @@ class TestRoute extends _i1.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i7.TablePage]
-class TableRoute extends _i1.PageRouteInfo<TableRouteArgs> {
-  TableRoute({_i8.Key? key})
-      : super(TableRoute.name, path: '', args: TableRouteArgs(key: key));
+class TableRoute extends _i1.PageRouteInfo<void> {
+  const TableRoute() : super(TableRoute.name, path: '');
 
   static const String name = 'TableRoute';
-}
-
-class TableRouteArgs {
-  const TableRouteArgs({this.key});
-
-  final _i8.Key? key;
-
-  @override
-  String toString() {
-    return 'TableRouteArgs{key: $key}';
-  }
 }

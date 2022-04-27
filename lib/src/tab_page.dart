@@ -98,7 +98,7 @@ class TabPage extends ConsumerWidget {
                       }
                     },
                   ) ??
-                  Text(""),
+                  const Text(""),
               leading: const AutoBackButton(),
               actions: [
                 IconButton(

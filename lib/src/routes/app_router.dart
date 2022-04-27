@@ -3,7 +3,7 @@ import 'package:meseros_app/src/features/authentication/views/login_page.dart';
 import 'package:meseros_app/src/features/authentication/views/select_user_page.dart';
 import 'package:meseros_app/src/routes/guards/auth_guard.dart';
 import 'package:meseros_app/src/screens/orders_page.dart';
-import 'package:meseros_app/src/screens/table_page.dart';
+import 'package:meseros_app/src/features/tableManagment/views/table_page.dart';
 import 'package:meseros_app/src/screens/test_page.dart';
 import 'package:meseros_app/src/tab_page.dart';
 
@@ -33,6 +33,7 @@ import 'package:meseros_app/src/tab_page.dart';
           page: EmptyRouterPage,
           children: [
             AutoRoute(path: '', page: TablePage),
+            AutoRoute(path: 'test', page: TestPage)
           ])
     ]),
   ]),

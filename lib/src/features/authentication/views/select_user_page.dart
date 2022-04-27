@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
@@ -15,6 +16,7 @@ class SelectUserPage extends ConsumerWidget {
           data: (value) => Text("Bienvenido " + value.user.name),
         ),
         backgroundColor: Colors.black,
+        leading: const AutoBackButton(),
       ),
       body: Container(
         padding: const EdgeInsets.all(40),

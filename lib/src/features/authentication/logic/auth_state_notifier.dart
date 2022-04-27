@@ -70,7 +70,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     user()?.isWaiter = isWaiter;
     saveStorage(user()!);
     state = AuthState.data(user: user()!);
-    AutoRouter.of(context).replace(TabsAppRouter());
+    AutoRouter.of(context).replaceNamed("app");
   }
 
   UserModel? user() {
