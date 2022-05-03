@@ -3,10 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/tableManagment/logic/table_provider.dart';
 
 class TableWidget extends ConsumerStatefulWidget {
-  double left;
-  double top;
+  num left;
+  num top;
   String nombre;
-  TableWidget({Key? key, this.left = 0.0, this.top = 0.0, this.nombre = "mesa"})
+  bool status;
+
+  TableWidget(
+      {Key? key,
+      this.left = 0.0,
+      this.top = 0.0,
+      this.nombre = "mesa",
+      this.status = false})
       : super(key: key);
 
   @override
@@ -18,16 +25,17 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
   Widget build(BuildContext context) {
     final state = ref.watch(isEditProvider);
 
-    return Positioned(
-      left: widget.left,
-      top: widget.top,
-      child: state
+    return AnimatedPositioned(
+      left: widget.left.toDouble(),
+      top: widget.top.toDouble(),
+      duration: Duration(milliseconds: !state ? 300 : 0),
+      child: state && !widget.status
           ? Draggable(
               child: ClipOval(
                 child: Container(
                   width: 100,
                   height: 100,
-                  color: Colors.blue[900],
+                  color: !widget.status ? Colors.blue[900] : Colors.red,
                   child: Center(
                       child: Text(
                     widget.nombre,
@@ -51,24 +59,36 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
               ),
               childWhenDragging: Container(),
               onDragEnd: (dragDetails) {
-                print(dragDetails.offset);
                 setState(() {
                   widget.left = dragDetails.offset.dx;
                   widget.top = dragDetails.offset.dy - 103;
                 });
               },
             )
-          : ClipOval(
-              child: Container(
-                width: 100,
-                height: 100,
-                color: Colors.blue[900],
-                child: Center(
-                    child: Text(
-                  widget.nombre,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                )),
+          : GestureDetector(
+              onVerticalDragStart: (DragStartDetails dd) {
+                if (state) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("${widget.nombre} tiene pedidos en curso"),
+                    duration: const Duration(seconds: 1),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
+                    behavior: SnackBarBehavior.floating,
+                  ));
+                }
+              },
+              child: ClipOval(
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  color: !widget.status ? Colors.blue[900] : Colors.red,
+                  child: Center(
+                      child: Text(
+                    widget.nombre,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  )),
+                ),
               ),
             ),
     );

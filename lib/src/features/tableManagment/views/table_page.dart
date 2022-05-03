@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
@@ -13,6 +14,37 @@ class TablePage extends ConsumerStatefulWidget {
 }
 
 class _TablePageState extends ConsumerState<TablePage> {
+  List<Widget> list2 = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getTables();
+  }
+
+  void getTables() {
+    CollectionReference collectionReference =
+        FirebaseFirestore.instance.collection("shots21/variables/mesas");
+    collectionReference.snapshots().listen((event) {
+      list2 = [];
+      if (mounted) {
+        setState(() {
+          for (var element in event.docs) {
+            var doc = element.data()! as Map;
+            list2.add(
+              TableWidget(
+                left: doc["left"]!,
+                top: doc["top"],
+                status: doc["status"],
+                nombre: doc["id"],
+              ),
+            );
+          }
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(isEditProvider);
@@ -33,10 +65,17 @@ class _TablePageState extends ConsumerState<TablePage> {
         body: Stack(
           clipBehavior: Clip.antiAlias,
           children: [
-            Container(
-              height: 600,
+            const SizedBox(
+              height: double.infinity,
+              width: double.infinity,
+              child: GridPaper(
+                color: Colors.black12,
+                divisions: 1,
+                interval: 200,
+                subdivisions: 8,
+              ),
             ),
-            ...list
+            ...list2
           ],
         ),
         floatingActionButton: authState.mapOrNull(
@@ -75,6 +114,4 @@ class _TablePageState extends ConsumerState<TablePage> {
             ) ??
             Column());
   }
-
-  moveTable(DragUpdateDetails dd, double x, double y) {}
 }

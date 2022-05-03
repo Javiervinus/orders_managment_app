@@ -19,7 +19,7 @@ class AuthRepository implements IAuthRepository {
           .post(EnvironmentConfig.apiUrl + "auth/login", data: data);
       if (result.statusCode == 201) {
         user = UserModel.fromJson(result.data);
-        return UserModel.fromJson(result.data);
+        return user!;
       } else {
         throw Exception();
       }
