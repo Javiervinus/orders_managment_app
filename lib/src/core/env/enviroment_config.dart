@@ -1,3 +1,4 @@
 class EnvironmentConfig {
-  static const apiUrl = "http://127.0.0.1:3000/api/v1/";
+  static const apiUrl =
+      "https://orders-managment-backend-kdrbcbodlq-uc.a.run.app/api/v1/";
 }
