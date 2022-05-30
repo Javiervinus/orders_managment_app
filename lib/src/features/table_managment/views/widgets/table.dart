@@ -1,18 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meseros_app/src/features/tableManagment/logic/table_provider.dart';
+import 'package:meseros_app/src/features/table_managment/logic/table_provider.dart';
 
 class TableWidget extends ConsumerStatefulWidget {
   num left;
   num top;
-  String nombre;
+  String id;
   bool status;
 
   TableWidget(
       {Key? key,
       this.left = 0.0,
       this.top = 0.0,
-      this.nombre = "mesa",
+      this.id = "",
       this.status = false})
       : super(key: key);
 
@@ -24,6 +25,7 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(isEditProvider);
+    final tableState = ref.watch(tablesProvider);
 
     return AnimatedPositioned(
       left: widget.left.toDouble(),
@@ -38,7 +40,7 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
                   color: !widget.status ? Colors.blue[900] : Colors.red,
                   child: Center(
                       child: Text(
-                    widget.nombre,
+                    widget.id.toString(),
                     style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   )),
@@ -51,7 +53,7 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
                   color: Colors.blue[900]!.withOpacity(0.7),
                   child: Center(
                       child: Text(
-                    widget.nombre,
+                    widget.id.toString(),
                     style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   )),
@@ -62,6 +64,16 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
                 setState(() {
                   widget.left = dragDetails.offset.dx;
                   widget.top = dragDetails.offset.dy - 103;
+                  FirebaseFirestore.instance
+                      .collection('shots21/variables/mesas')
+                      .doc(widget.id)
+                      .update({
+                    "x": widget.left,
+                    "y": widget.top,
+                    "ref": FirebaseFirestore.instance
+                        .collection('shots21/variables/mesas')
+                        .doc(widget.id)
+                  });
                 });
               },
             )
@@ -69,7 +81,7 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
               onVerticalDragStart: (DragStartDetails dd) {
                 if (state) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("${widget.nombre} tiene pedidos en curso"),
+                    content: Text("${widget.id} tiene pedidos en curso"),
                     duration: const Duration(seconds: 1),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0)),
@@ -84,7 +96,7 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
                   color: !widget.status ? Colors.blue[900] : Colors.red,
                   child: Center(
                       child: Text(
-                    widget.nombre,
+                    widget.id.toString(),
                     style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   )),

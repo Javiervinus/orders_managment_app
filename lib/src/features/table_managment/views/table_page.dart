@@ -1,10 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
-import 'package:meseros_app/src/features/tableManagment/views/widgets/table.dart';
-import 'package:meseros_app/src/features/tableManagment/logic/table_provider.dart';
+import 'package:meseros_app/src/features/table_managment/views/widgets/table.dart';
+import 'package:meseros_app/src/features/table_managment/logic/table_provider.dart';
 
 class TablePage extends ConsumerStatefulWidget {
   const TablePage({Key? key}) : super(key: key);
@@ -14,53 +13,33 @@ class TablePage extends ConsumerStatefulWidget {
 }
 
 class _TablePageState extends ConsumerState<TablePage> {
-  List<Widget> list2 = [];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getTables();
-  }
-
-  void getTables() {
-    CollectionReference collectionReference =
-        FirebaseFirestore.instance.collection("shots21/variables/mesas");
-    collectionReference.snapshots().listen((event) {
-      list2 = [];
-      if (mounted) {
-        setState(() {
-          for (var element in event.docs) {
-            var doc = element.data()! as Map;
-            list2.add(
-              TableWidget(
-                left: doc["left"]!,
-                top: doc["top"],
-                status: doc["status"],
-                nombre: doc["id"],
-              ),
-            );
-          }
-        });
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(isEditProvider);
     final authState = ref.watch(authNotifierProvider);
+    final tableState = ref.watch(tablesProvider);
+    List<Widget> tablesList = tableState.whenOrNull(
+          data: (data) {
+            List<Widget> l = [];
+            for (var item in data) {
+              l.add(TableWidget(
+                top: item.y!,
+                left: item.x!,
+                status: item.hasOrder!,
+                id: item.idF!,
+              ));
+            }
+            return l;
+          },
+        ) ??
+        [];
 
-    List<Widget> list = [
-      TableWidget(
-        left: 80,
-        top: 30,
-      ),
-      TableWidget(
-        left: MediaQuery.of(context).size.width / 2.5,
-        top: MediaQuery.of(context).size.height / 3,
-        nombre: "prueba",
-      )
-    ];
     return Scaffold(
         body: Stack(
           clipBehavior: Clip.antiAlias,
@@ -75,7 +54,7 @@ class _TablePageState extends ConsumerState<TablePage> {
                 subdivisions: 8,
               ),
             ),
-            ...list2
+            ...tablesList
           ],
         ),
         floatingActionButton: authState.mapOrNull(
@@ -98,7 +77,7 @@ class _TablePageState extends ConsumerState<TablePage> {
                       FloatingActionButton(
                           child: !state
                               ? const Icon(Icons.edit)
-                              : const Icon(Icons.save),
+                              : const Icon(Icons.close),
                           onPressed: (() {
                             ref
                                 .read(isEditProvider.notifier)

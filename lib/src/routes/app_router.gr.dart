@@ -15,7 +15,7 @@ import 'package:flutter/material.dart' as _i8;
 
 import '../features/authentication/views/login_page.dart' as _i3;
 import '../features/authentication/views/select_user_page.dart' as _i4;
-import '../features/tableManagment/views/table_page.dart' as _i7;
+import '../features/table_managment/views/table_page.dart' as _i7;
 import '../screens/orders_page.dart' as _i5;
 import '../screens/test_page.dart' as _i6;
 import '../tab_page.dart' as _i2;
@@ -44,10 +44,8 @@ class AppRouter extends _i1.RootStackRouter {
           routeData: routeData, child: const _i2.TabPage());
     },
     LoginRoute.name: (routeData) {
-      final args = routeData.argsAs<LoginRouteArgs>(
-          orElse: () => const LoginRouteArgs());
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.LoginPage(key: args.key));
+          routeData: routeData, child: const _i3.LoginPage());
     },
     UserType.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
@@ -150,22 +148,10 @@ class TabsAppRouter extends _i1.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.LoginPage]
-class LoginRoute extends _i1.PageRouteInfo<LoginRouteArgs> {
-  LoginRoute({_i8.Key? key})
-      : super(LoginRoute.name, path: '', args: LoginRouteArgs(key: key));
+class LoginRoute extends _i1.PageRouteInfo<void> {
+  const LoginRoute() : super(LoginRoute.name, path: '');
 
   static const String name = 'LoginRoute';
-}
-
-class LoginRouteArgs {
-  const LoginRouteArgs({this.key});
-
-  final _i8.Key? key;
-
-  @override
-  String toString() {
-    return 'LoginRouteArgs{key: $key}';
-  }
 }
 
 /// generated route for

@@ -1,5 +1,4 @@
-import 'package:dio/dio.dart';
-import 'package:meseros_app/src/core/env/enviroment_config.dart';
+import 'package:meseros_app/src/core/http/dio.dart';
 import 'package:meseros_app/src/features/authentication/data/models/user_model.dart';
 
 abstract class IAuthRepository {
@@ -9,14 +8,11 @@ abstract class IAuthRepository {
 }
 
 class AuthRepository implements IAuthRepository {
-  final _dioClient = Dio();
-
   @override
   Future<UserModel> login(String email, String password) async {
     try {
       var data = {"email": email.trim(), "password": password.trim()};
-      final result = await _dioClient
-          .post(EnvironmentConfig.apiUrl + "auth/login", data: data);
+      final result = await DioClient().dio.post("auth/login", data: data);
       if (result.statusCode == 201) {
         user = UserModel.fromJson(result.data);
         return user!;
