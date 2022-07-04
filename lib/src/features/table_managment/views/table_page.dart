@@ -38,7 +38,7 @@ class _TablePageState extends ConsumerState<TablePage> {
             return l;
           },
         ) ??
-        [];
+        [const Text("no hay")];
 
     return Scaffold(
         body: Stack(

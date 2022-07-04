@@ -20,13 +20,15 @@ class TableRepository implements ITableRepository {
       .collection("shots21/variables/mesas")
       .snapshots()
       .map((event) => event.docs.map((e) {
-            if (e.data()["ref"] != null) {
-              var a = e.data()["ref"] as DocumentReference;
-              a.get().then((value) => print(value.data()));
-            }
-            DocumentReference d = e.data()["ref"];
+            // if (e.data()["ref"] != null) {
+            //   var a = e.data()["ref"] as DocumentReference;
+            //   a.get().then((value) => print(value.data()));
+            // }
+            // DocumentReference d = e.data()["ref"];
             var table = TableModel.fromJson(e.data());
+
             table.idF = e.id;
+
             return table;
           }).toList());
 }
