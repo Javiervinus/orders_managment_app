@@ -1,108 +1,120 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meseros_app/src/features/table_managment/data/models/table_model.dart';
 import 'package:meseros_app/src/features/table_managment/logic/table_provider.dart';
+import 'package:meseros_app/src/features/table_managment/views/widgets/hero_dialog.dart';
 
 class TableWidget extends ConsumerStatefulWidget {
-  num left;
-  num top;
-  String id;
-  bool status;
+  int index;
 
-  TableWidget(
-      {Key? key,
-      this.left = 0.0,
-      this.top = 0.0,
-      this.id = "",
-      this.status = false})
-      : super(key: key);
+  TableWidget({Key? key, required this.index}) : super(key: key);
 
   @override
   _TableWidgetState createState() => _TableWidgetState();
 }
 
 class _TableWidgetState extends ConsumerState<TableWidget> {
+  List<TableModel> tables = [];
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(isEditProvider);
-    final tableState = ref.watch(tablesProvider);
+    final tablesState = ref.watch(tablesProvider);
+    tables = tablesState.whenOrNull(
+          data: (tables) {
+            return tables;
+          },
+        ) ??
+        [];
+    return widget.index <
+            tablesState.whenOrNull(
+              data: (data) => data.length,
+            )!
+        ? GestureDetector(
+            onTap: () {
+              if (!state) print("viendo ordenes");
+            },
+            onLongPress: () {
+              if (state) {
+                print("editando mesa ${tables[widget.index].id}");
 
-    return AnimatedPositioned(
-      left: widget.left.toDouble(),
-      top: widget.top.toDouble(),
-      duration: Duration(milliseconds: !state ? 300 : 0),
-      child: state && !widget.status
-          ? Draggable(
-              child: ClipOval(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: !widget.status ? Colors.blue[900] : Colors.red,
-                  child: Center(
-                      child: Text(
-                    widget.id.toString(),
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
-                ),
-              ),
-              feedback: ClipOval(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue[900]!.withOpacity(0.7),
-                  child: Center(
-                      child: Text(
-                    widget.id.toString(),
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
-                ),
-              ),
-              childWhenDragging: Container(),
-              onDragEnd: (dragDetails) {
-                setState(() {
-                  widget.left = dragDetails.offset.dx;
-                  widget.top = dragDetails.offset.dy - 103;
-                  FirebaseFirestore.instance
-                      .collection('shots21/variables/mesas')
-                      .doc(widget.id)
-                      .update({
-                    "x": widget.left,
-                    "y": widget.top,
-                    "ref": FirebaseFirestore.instance
-                        .collection('shots21/variables/mesas')
-                        .doc(widget.id)
-                  });
-                });
-              },
-            )
-          : GestureDetector(
-              onVerticalDragStart: (DragStartDetails dd) {
-                if (state) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("${widget.id} tiene pedidos en curso"),
-                    duration: const Duration(seconds: 1),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0)),
-                    behavior: SnackBarBehavior.floating,
+                Navigator.push(context,
+                    HeroDialogRoute(builder: (BuildContext context) {
+                  return Center(
+                      child: AlertDialog(
+                    scrollable: true,
+                    alignment: Alignment.center,
+                    title: Text(
+                      "Mesa ${tables[widget.index].id}",
+                    ),
+                    actions: [
+                      ElevatedButton(
+                          onPressed: () {}, child: const Text("Guardar"))
+                    ],
+                    content: Column(
+                      children: [
+                        Hero(
+                          tag: "table-${widget.index}",
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  shape: tables[widget.index].shape == 'r'
+                                      ? BoxShape.rectangle
+                                      : BoxShape.circle,
+                                  color: tables[widget.index].hasOrder!
+                                      ? Colors.green
+                                      : Colors.grey),
+                              child: SizedBox(
+                                width: 200,
+                                height: 100,
+                                child: Column(
+                                  children: const <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        ),
+                        TextField(
+                          decoration: const InputDecoration(
+                            labelText: 'Forma',
+                          ),
+                          onChanged: (text) => setState(() {}),
+                        ),
+                      ],
+                    ),
                   ));
-                }
-              },
-              child: ClipOval(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: !widget.status ? Colors.blue[900] : Colors.red,
-                  child: Center(
-                      child: Text(
-                    widget.id.toString(),
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                }));
+              }
+            },
+            child: Hero(
+              tag: "table-${widget.index}",
+              child: Container(
+                  decoration: BoxDecoration(
+                      shape: tables[widget.index].shape == 'r'
+                          ? BoxShape.rectangle
+                          : BoxShape.circle,
+                      color: tables[widget.index].hasOrder!
+                          ? Colors.green
+                          : Colors.grey),
+                  child: SizedBox(
+                    width: 200,
+                    height: 100,
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Mesa ${tables[widget.index].id}",
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 18.0),
+                          ),
+                        ),
+                      ],
+                    ),
                   )),
-                ),
-              ),
             ),
-    );
+          )
+        : Container();
   }
 }

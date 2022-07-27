@@ -14,6 +14,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState.loading();
     try {
       final user = await _authRepository.login(email, password);
+      print(user.toJson());
       state = AuthState.data(user: user);
       FocusManager.instance.primaryFocus?.unfocus();
       saveStorage(user);

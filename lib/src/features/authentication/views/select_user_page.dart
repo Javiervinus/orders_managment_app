@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
+import 'package:meseros_app/src/features/table_managment/logic/table_provider.dart';
 
 class SelectUserPage extends ConsumerWidget {
   const SelectUserPage({Key? key}) : super(key: key);
@@ -9,7 +10,11 @@ class SelectUserPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authNotifierProvider);
-
+    state.whenOrNull(
+      data: (user) {
+        ref.read(mapProvider);
+      },
+    );
     return Scaffold(
       appBar: AppBar(
         title: state.mapOrNull(

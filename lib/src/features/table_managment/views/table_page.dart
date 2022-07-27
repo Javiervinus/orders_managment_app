@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
+import 'package:meseros_app/src/features/table_managment/data/models/table_model.dart';
+import 'package:meseros_app/src/features/table_managment/views/widgets/table.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 import '../logic/table_provider.dart';
 
@@ -14,45 +16,44 @@ class TablePage extends ConsumerStatefulWidget {
 }
 
 class _TablePageState extends ConsumerState<TablePage> {
-  List<vector.Vector3> vectores = [];
+  List<TableModel> tables = [];
+  Map<String, dynamic>? map;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    ref.read(isChanging);
-    ref.read(matrixProvider);
     ref.read(tablesProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    print("object");
-    final state = ref.watch(isEditProvider);
+    bool state = ref.watch(isEditProvider);
     final authState = ref.watch(authNotifierProvider);
     final tableState = ref.watch(tablesProvider);
+    var map2 = ref.watch(mapObj);
     Matrix4 matrix = Matrix4.identity();
     ValueNotifier<int> pageState = ValueNotifier(0);
-    tableState.whenOrNull(
-      data: (tables) {
-        vectores = [];
-        num sumx = 0;
-        num sumy = 0;
-        for (var table in tables) {
-          sumx = sumx + table.x!;
-          sumy = sumy + table.y!;
-          vector.Vector3 node =
-              vector.Vector3(table.x!.toDouble(), table.y!.toDouble(), 0);
-          vectores.add(node);
-        }
-        adjustMatrix(matrix);
-      },
-    );
+    tables = tableState.whenOrNull(
+          data: (tables) {
+            return tables;
+          },
+        ) ??
+        [];
+    if (tables.isNotEmpty) {
+      adjustMatrix(matrix, map2);
+    }
     return Scaffold(
         body: LayoutBuilder(
           builder: (ctx, constraints) => MatrixGestureDetector(
-              shouldRotate: false,
+              shouldRotate: true,
               onMatrixUpdate: (m, tm, sm, rm) {
                 matrix = MatrixGestureDetector.compose(matrix, tm, sm, null);
+                double x = matrix.getTranslation().x;
+                double y = matrix.getTranslation().y;
+                double zoom =
+                    MatrixGestureDetector.decomposeToValues(matrix).scale;
+                map2?['x'] = x;
+                map2?['y'] = y;
+                map2?['zoom'] = zoom;
                 pageState.value++;
               },
               child: Container(
@@ -68,10 +69,23 @@ class _TablePageState extends ConsumerState<TablePage> {
                         height: double.infinity,
                         child: Stack(
                           children: [
-                            ...List.generate(
-                                vectores.length,
-                                (index) =>
-                                    buildNode2(matrix, pageState, index)),
+                            GridPaper(
+                              divisions: 2,
+                              color: Colors.black.withOpacity(0.5),
+                              subdivisions: 3,
+                              child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                color: Colors.white,
+                              ),
+                            ),
+                            if (tables.isNotEmpty)
+                              ...List.generate(
+                                  tableState.whenOrNull(
+                                    data: (data) => data.length,
+                                  )!,
+                                  (index) =>
+                                      buildNode(matrix, pageState, index)),
                           ],
                         ));
                   },
@@ -86,6 +100,7 @@ class _TablePageState extends ConsumerState<TablePage> {
                     children: [
                       state
                           ? FloatingActionButton(
+                              heroTag: null,
                               child: const Icon(Icons.add),
                               onPressed: (() {
                                 AutoRouter.of(context).navigateNamed("login");
@@ -97,9 +112,32 @@ class _TablePageState extends ConsumerState<TablePage> {
                       ),
                       state
                           ? FloatingActionButton(
+                              heroTag: null,
                               child: const Icon(Icons.save),
                               onPressed: (() {
-                                print(vectores);
+                                List<TableModel> _toSave =
+                                    tables.where((i) => i.isEdit).toList();
+                                for (var t in _toSave) {
+                                  ref.read(databaseProvider)?.editTablePosition(
+                                      t.idF!, t.vector!.x, t.vector!.y);
+                                }
+                                ref
+                                    .read(isEditProvider.notifier)
+                                    .update((state) => !state);
+
+                                double x = matrix.getTranslation().x;
+                                double y = matrix.getTranslation().y;
+
+                                double zoom =
+                                    MatrixGestureDetector.decomposeToValues(
+                                            matrix)
+                                        .scale;
+                                ref.read(databaseProvider)?.createMap(
+                                    x,
+                                    y,
+                                    zoom,
+                                    authState.whenOrNull(
+                                        data: (user) => user.id)!);
                               }),
                               backgroundColor: state ? Colors.blue : null)
                           : const Text(""),
@@ -107,6 +145,7 @@ class _TablePageState extends ConsumerState<TablePage> {
                         height: 10,
                       ),
                       FloatingActionButton(
+                          heroTag: null,
                           child: !state
                               ? const Icon(Icons.edit)
                               : const Icon(Icons.close),
@@ -126,38 +165,38 @@ class _TablePageState extends ConsumerState<TablePage> {
             Column());
   }
 
-  Widget buildNode2(Matrix4 matrix, ValueNotifier<int> pageState, int index) {
+  Widget buildNode(Matrix4 matrix, ValueNotifier<int> pageState, int index) {
     Matrix4 ma = matrix.clone();
-    ma.translate(vectores[index].x, vectores[index].y);
+    ma.translate(tables[index].vector!.x, tables[index].vector!.y);
     return Transform(
         transform: ma,
         child: MatrixGestureDetector(
-            shouldRotate: false,
+            shouldRotate: true,
             shouldScale: false,
             onMatrixUpdate: (m, tm, sm, rm) {
-              Matrix4 change = tm;
-              double sc = MatrixGestureDetector.decomposeToValues(matrix).scale;
-              vectores[index] += change.getTranslation() / sc;
-              pageState.value++;
+              if (ref.read(isEditProvider)) {
+                Matrix4 change = tm;
+                double sc =
+                    MatrixGestureDetector.decomposeToValues(matrix).scale;
+                tables[index].vector =
+                    tables[index].vector! + change.getTranslation() / sc;
+                tables[index].isEdit = true;
+                pageState.value++;
+              }
             },
-            child: Container(
-                decoration: const BoxDecoration(color: Colors.blue),
-                child: SizedBox(
-                  width: 200,
-                  height: 100,
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        "Node ${vectores[index].x}\n${vectores[index].y}",
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 18.0),
-                      ),
-                    ],
-                  ),
-                ))));
+            child: TableWidget(index: index)));
   }
 
-  adjustMatrix(Matrix4 matrix) {
+  adjustMatrix(Matrix4 matrix, Map<String, dynamic>? map) {
+    if (map != null) {
+      matrix.scale(map['zoom'], map['zoom'], 0);
+      matrix.setTranslationRaw(map['x'], map['y'], 0);
+      return;
+    }
+    List<vector.Vector3> vectores = [];
+    for (var t in tables) {
+      vectores.add(t.vector!);
+    }
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height - 150;
     vector.Vector3 maxNodeX = vectores.reduce((a, b) => a.x > b.x ? a : b);
@@ -175,6 +214,11 @@ class _TablePageState extends ConsumerState<TablePage> {
       zoom = width / differenceX;
     } else {
       zoom = height / differenceY;
+      double zoom2 = 0;
+      if (differenceX > width) {
+        zoom2 = width / differenceX;
+      }
+      zoom = (zoom2 + zoom) / 2;
     }
     zoom = zoom > 1 ? 1 : zoom;
     zoom = zoom > 0.55 ? zoom - 0.24 : zoom - 0.1;

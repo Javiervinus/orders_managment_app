@@ -11,23 +11,24 @@
 // ignore_for_file: type=lint
 
 import 'package:auto_route/auto_route.dart' as _i1;
-import 'package:flutter/material.dart' as _i8;
+import 'package:flutter/material.dart' as _i9;
 
+import '../core/widgets/hero_empty_router_page.dart' as _i5;
 import '../features/authentication/views/login_page.dart' as _i3;
 import '../features/authentication/views/select_user_page.dart' as _i4;
-import '../features/table_managment/views/table_page.dart' as _i7;
-import '../screens/orders_page.dart' as _i5;
-import '../screens/test_page.dart' as _i6;
+import '../features/table_managment/views/table_page.dart' as _i8;
+import '../screens/orders_page.dart' as _i6;
+import '../screens/test_page.dart' as _i7;
 import '../tab_page.dart' as _i2;
-import 'guards/auth_guard.dart' as _i9;
+import 'guards/auth_guard.dart' as _i10;
 
 class AppRouter extends _i1.RootStackRouter {
   AppRouter(
-      {_i8.GlobalKey<_i8.NavigatorState>? navigatorKey,
+      {_i9.GlobalKey<_i9.NavigatorState>? navigatorKey,
       required this.authGuard})
       : super(navigatorKey);
 
-  final _i9.AuthGuard authGuard;
+  final _i10.AuthGuard authGuard;
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
@@ -57,21 +58,19 @@ class AppRouter extends _i1.RootStackRouter {
     },
     TablesRouter.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: const _i1.EmptyRouterPage());
+          routeData: routeData, child: _i5.HeroEmptyRouterPage());
     },
     OrdersRoute.name: (routeData) {
-      final args = routeData.argsAs<OrdersRouteArgs>(
-          orElse: () => const OrdersRouteArgs());
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i5.OrdersPage(key: args.key));
+          routeData: routeData, child: const _i6.OrdersPage());
     },
     TestRoute.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: const _i6.TestPage());
+          routeData: routeData, child: const _i7.TestPage());
     },
     TableRoute.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: const _i7.TablePage());
+          routeData: routeData, child: const _i8.TablePage());
     }
   };
 
@@ -172,7 +171,7 @@ class OrdersRouter extends _i1.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i1.EmptyRouterPage]
+/// [_i5.HeroEmptyRouterPage]
 class TablesRouter extends _i1.PageRouteInfo<void> {
   const TablesRouter({List<_i1.PageRouteInfo>? children})
       : super(TablesRouter.name, path: 'tables', initialChildren: children);
@@ -181,27 +180,15 @@ class TablesRouter extends _i1.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i5.OrdersPage]
-class OrdersRoute extends _i1.PageRouteInfo<OrdersRouteArgs> {
-  OrdersRoute({_i8.Key? key})
-      : super(OrdersRoute.name, path: '', args: OrdersRouteArgs(key: key));
+/// [_i6.OrdersPage]
+class OrdersRoute extends _i1.PageRouteInfo<void> {
+  const OrdersRoute() : super(OrdersRoute.name, path: '');
 
   static const String name = 'OrdersRoute';
 }
 
-class OrdersRouteArgs {
-  const OrdersRouteArgs({this.key});
-
-  final _i8.Key? key;
-
-  @override
-  String toString() {
-    return 'OrdersRouteArgs{key: $key}';
-  }
-}
-
 /// generated route for
-/// [_i6.TestPage]
+/// [_i7.TestPage]
 class TestRoute extends _i1.PageRouteInfo<void> {
   const TestRoute() : super(TestRoute.name, path: 'test');
 
@@ -209,7 +196,7 @@ class TestRoute extends _i1.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i7.TablePage]
+/// [_i8.TablePage]
 class TableRoute extends _i1.PageRouteInfo<void> {
   const TableRoute() : super(TableRoute.name, path: '');
 

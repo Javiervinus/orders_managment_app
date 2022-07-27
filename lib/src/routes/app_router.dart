@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:meseros_app/src/core/widgets/hero_empty_router_page.dart';
 import 'package:meseros_app/src/features/authentication/views/login_page.dart';
 import 'package:meseros_app/src/features/authentication/views/select_user_page.dart';
 import 'package:meseros_app/src/routes/guards/auth_guard.dart';
@@ -30,7 +31,7 @@ import 'package:meseros_app/src/tab_page.dart';
       AutoRoute(
           path: 'tables',
           name: 'TablesRouter',
-          page: EmptyRouterPage,
+          page: HeroEmptyRouterPage,
           children: [
             AutoRoute(path: '', page: TablePage),
             AutoRoute(path: 'test', page: TestPage)

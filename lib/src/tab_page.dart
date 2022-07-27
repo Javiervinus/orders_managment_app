@@ -11,7 +11,6 @@ class TabPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authNotifierProvider);
-
     return AutoTabsScaffold(
         appBarBuilder: (_, tabsRouter) => AppBar(
               backgroundColor: Colors.black,

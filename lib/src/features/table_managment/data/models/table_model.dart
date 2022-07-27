@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:vector_math/vector_math_64.dart';
+
 part 'table_model.g.dart';
 
 @JsonSerializable()
@@ -8,9 +10,20 @@ class TableModel extends Equatable {
   String? idF;
   num? x;
   num? y;
+  bool isEdit;
   bool? hasOrder;
+  String shape;
 
-  TableModel(this.hasOrder, this.id, this.idF, this.x, this.y);
+  @JsonKey(ignore: true)
+  Vector3? vector;
+  TableModel(
+      {this.hasOrder,
+      required this.id,
+      this.idF,
+      this.x,
+      this.y,
+      this.isEdit = false,
+      this.shape = 'r'});
 
   factory TableModel.fromJson(Map<String, dynamic> json) =>
       _$TableModelFromJson(json);
