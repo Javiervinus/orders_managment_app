@@ -14,7 +14,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState.loading();
     try {
       final user = await _authRepository.login(email, password);
-      print(user.toJson());
       state = AuthState.data(user: user);
       FocusManager.instance.primaryFocus?.unfocus();
       saveStorage(user);
@@ -64,7 +63,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   saveStorage(UserModel user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final str = jsonEncode(user.toJson());
+    final token = user.accessToken;
+
     prefs.setString("user", str);
+    prefs.setString("token", token!);
   }
 
   selectTypeUser(bool? isWaiter, BuildContext context) {

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meseros_app/src/features/table_managment/data/models/table_model.dart';
 import 'package:meseros_app/src/features/table_managment/logic/table_provider.dart';
-import 'package:meseros_app/src/features/table_managment/views/widgets/hero_dialog.dart';
+import 'package:meseros_app/src/core/helpers/hero_dialog.dart';
+import 'package:meseros_app/src/features/table_managment/views/widgets/table_dialog.dart';
 
 class TableWidget extends ConsumerStatefulWidget {
   int index;
@@ -19,6 +20,7 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(isEditProvider);
+    final isDialogOpen = ref.watch(isOpenDialog);
     final tablesState = ref.watch(tablesProvider);
     tables = tablesState.whenOrNull(
           data: (tables) {
@@ -36,79 +38,36 @@ class _TableWidgetState extends ConsumerState<TableWidget> {
             },
             onLongPress: () {
               if (state) {
-                print("editando mesa ${tables[widget.index].id}");
-
+                print("editando mesa ${tables[widget.index].name}");
+                ref.read(isOpenDialog).value = false;
                 Navigator.push(context,
                     HeroDialogRoute(builder: (BuildContext context) {
-                  return Center(
-                      child: AlertDialog(
-                    scrollable: true,
-                    alignment: Alignment.center,
-                    title: Text(
-                      "Mesa ${tables[widget.index].id}",
-                    ),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {}, child: const Text("Guardar"))
-                    ],
-                    content: Column(
-                      children: [
-                        Hero(
-                          tag: "table-${widget.index}",
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  shape: tables[widget.index].shape == 'r'
-                                      ? BoxShape.rectangle
-                                      : BoxShape.circle,
-                                  color: tables[widget.index].hasOrder!
-                                      ? Colors.green
-                                      : Colors.grey),
-                              child: SizedBox(
-                                width: 200,
-                                height: 100,
-                                child: Column(
-                                  children: const <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ),
-                        TextField(
-                          decoration: const InputDecoration(
-                            labelText: 'Forma',
-                          ),
-                          onChanged: (text) => setState(() {}),
-                        ),
-                      ],
-                    ),
-                  ));
-                }));
+                  return TableDialogWidget(
+                      table: tables[widget.index],
+                      heroTag: "table-${widget.index}");
+                })).whenComplete(() => ref.read(isOpenDialog).value = true);
               }
             },
             child: Hero(
               tag: "table-${widget.index}",
               child: Container(
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                       shape: tables[widget.index].shape == 'r'
-                          ? BoxShape.rectangle
-                          : BoxShape.circle,
-                      color: tables[widget.index].hasOrder!
+                          ? const RoundedRectangleBorder()
+                          : const CircleBorder(),
+                      color: tables[widget.index].hasOrder
                           ? Colors.green
                           : Colors.grey),
                   child: SizedBox(
                     width: 200,
-                    height: 100,
+                    height: tables[widget.index].shape == 'r' ? 100 : 130,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "Mesa ${tables[widget.index].id}",
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 18.0),
-                          ),
+                        Text(
+                          "Mesa ${tables[widget.index].name}",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 18.0),
                         ),
                       ],
                     ),

@@ -13,12 +13,13 @@ class UserModel extends Equatable {
   String rol;
   bool isAdmin;
   bool? isWaiter;
+  int? branchId;
   @JsonKey(name: "access_token")
   final String? accessToken;
   WaiterModel? waiter;
   ChefModel? chef;
   UserModel(this.id, this.name, this.lastName, this.email, this.isAdmin,
-      this.accessToken, this.rol, this.waiter, this.chef);
+      this.accessToken, this.rol, this.waiter, this.chef, this.branchId);
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);

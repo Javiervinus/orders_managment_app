@@ -20,6 +20,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       json['chef'] == null
           ? null
           : ChefModel.fromJson(json['chef'] as Map<String, dynamic>),
+      json['branchId'] as int?,
     )..isWaiter = json['isWaiter'] as bool?;
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -30,6 +31,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'rol': instance.rol,
       'isAdmin': instance.isAdmin,
       'isWaiter': instance.isWaiter,
+      'branchId': instance.branchId,
       'access_token': instance.accessToken,
       'waiter': instance.waiter?.toJson(),
       'chef': instance.chef?.toJson(),

@@ -9,6 +9,7 @@ class DioClient {
   factory DioClient() {
     _singleton.dio = Dio(BaseOptions(baseUrl: EnvironmentConfig.apiUrl));
     _singleton.dio.interceptors.add(AppInterceptors());
+    print("dio");
     return _singleton;
   }
 }

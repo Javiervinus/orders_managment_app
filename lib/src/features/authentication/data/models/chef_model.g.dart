@@ -7,9 +7,9 @@ part of 'chef_model.dart';
 // **************************************************************************
 
 ChefModel _$ChefModelFromJson(Map<String, dynamic> json) => ChefModel(
-      json['branchId'] as int?,
+      json['id'] as int?,
     );
 
 Map<String, dynamic> _$ChefModelToJson(ChefModel instance) => <String, dynamic>{
-      'branchId': instance.branchId,
+      'id': instance.id,
     };

@@ -11,9 +11,7 @@ class AppInterceptors extends Interceptor {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.get("token");
-
     options.headers.addAll({"Authorization": "Bearer $token"});
-
     return super.onRequest(options, handler);
   }
 

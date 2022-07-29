@@ -6,23 +6,28 @@ part 'table_model.g.dart';
 
 @JsonSerializable()
 class TableModel extends Equatable {
-  final int id;
+  @JsonKey(includeIfNull: false)
+  int? id;
+  @JsonKey(includeIfNull: false)
   String? idF;
   num? x;
   num? y;
+  @JsonKey(ignore: true)
   bool isEdit;
-  bool? hasOrder;
+  bool hasOrder;
   String shape;
+  String name;
 
   @JsonKey(ignore: true)
   Vector3? vector;
   TableModel(
-      {this.hasOrder,
-      required this.id,
+      {this.hasOrder = false,
+      this.id,
       this.idF,
       this.x,
       this.y,
       this.isEdit = false,
+      this.name = "",
       this.shape = 'r'});
 
   factory TableModel.fromJson(Map<String, dynamic> json) =>

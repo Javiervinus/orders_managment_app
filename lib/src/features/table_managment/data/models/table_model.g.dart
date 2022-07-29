@@ -7,22 +7,30 @@ part of 'table_model.dart';
 // **************************************************************************
 
 TableModel _$TableModelFromJson(Map<String, dynamic> json) => TableModel(
-      hasOrder: json['hasOrder'] as bool?,
-      id: json['id'] as int,
+      hasOrder: json['hasOrder'] as bool? ?? false,
+      id: json['id'] as int?,
       idF: json['idF'] as String?,
       x: json['x'] as num?,
       y: json['y'] as num?,
-      isEdit: json['isEdit'] as bool? ?? false,
+      name: json['name'] as String? ?? "",
       shape: json['shape'] as String? ?? 'r',
     );
 
-Map<String, dynamic> _$TableModelToJson(TableModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'idF': instance.idF,
-      'x': instance.x,
-      'y': instance.y,
-      'isEdit': instance.isEdit,
-      'hasOrder': instance.hasOrder,
-      'shape': instance.shape,
-    };
+Map<String, dynamic> _$TableModelToJson(TableModel instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('idF', instance.idF);
+  val['x'] = instance.x;
+  val['y'] = instance.y;
+  val['hasOrder'] = instance.hasOrder;
+  val['shape'] = instance.shape;
+  val['name'] = instance.name;
+  return val;
+}

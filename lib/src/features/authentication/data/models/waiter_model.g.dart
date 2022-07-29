@@ -7,10 +7,10 @@ part of 'waiter_model.dart';
 // **************************************************************************
 
 WaiterModel _$WaiterModelFromJson(Map<String, dynamic> json) => WaiterModel(
-      json['branchId'] as int?,
+      json['id'] as int?,
     );
 
 Map<String, dynamic> _$WaiterModelToJson(WaiterModel instance) =>
     <String, dynamic>{
-      'branchId': instance.branchId,
+      'id': instance.id,
     };

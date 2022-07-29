@@ -1,10 +1,12 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
+import 'package:meseros_app/src/core/helpers/hero_dialog.dart';
 import 'package:meseros_app/src/features/authentication/logic/auth_provider.dart';
 import 'package:meseros_app/src/features/table_managment/data/models/table_model.dart';
 import 'package:meseros_app/src/features/table_managment/views/widgets/table.dart';
+import 'package:meseros_app/src/features/table_managment/views/widgets/table_dialog.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 import '../logic/table_provider.dart';
 
@@ -29,6 +31,8 @@ class _TablePageState extends ConsumerState<TablePage> {
     bool state = ref.watch(isEditProvider);
     final authState = ref.watch(authNotifierProvider);
     final tableState = ref.watch(tablesProvider);
+    ValueNotifier<bool> isDialogOpen = ref.watch(isOpenDialog);
+
     var map2 = ref.watch(mapObj);
     Matrix4 matrix = Matrix4.identity();
     ValueNotifier<int> pageState = ValueNotifier(0);
@@ -95,68 +99,136 @@ class _TablePageState extends ConsumerState<TablePage> {
         floatingActionButton: authState.mapOrNull(
               data: (value) {
                 if (value.user.isWaiter == null) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  return SpeedDial(
+                    openCloseDial: isDialogOpen,
+                    closeManually: false,
+                    animatedIcon: AnimatedIcons.menu_close,
+                    backgroundColor: Colors.black,
+                    activeBackgroundColor: Colors.red,
+                    onOpen: () {
+                      ref.read(isEditProvider.notifier).state = true;
+                    },
+                    onClose: () {
+                      ref
+                          .read(isEditProvider.notifier)
+                          .update((state) => false);
+                    },
+                    renderOverlay: false,
                     children: [
-                      state
-                          ? FloatingActionButton(
-                              heroTag: null,
-                              child: const Icon(Icons.add),
-                              onPressed: (() {
-                                AutoRouter.of(context).navigateNamed("login");
-                              }),
-                              backgroundColor: state ? Colors.black : null)
-                          : const Text(""),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      state
-                          ? FloatingActionButton(
-                              heroTag: null,
-                              child: const Icon(Icons.save),
-                              onPressed: (() {
-                                List<TableModel> _toSave =
-                                    tables.where((i) => i.isEdit).toList();
-                                for (var t in _toSave) {
-                                  ref.read(databaseProvider)?.editTablePosition(
-                                      t.idF!, t.vector!.x, t.vector!.y);
-                                }
-                                ref
-                                    .read(isEditProvider.notifier)
-                                    .update((state) => !state);
+                      SpeedDialChild(
+                          child: const Icon(
+                            Icons.save,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: Colors.blue,
+                          onTap: () {
+                            List<TableModel> _toSave =
+                                tables.where((i) => i.isEdit).toList();
+                            for (var t in _toSave) {
+                              var data = {"x": t.vector!.x, "y": t.vector!.y};
+                              ref
+                                  .read(databaseProvider)
+                                  ?.editTable(t.idF!, data);
+                            }
 
-                                double x = matrix.getTranslation().x;
-                                double y = matrix.getTranslation().y;
-
-                                double zoom =
-                                    MatrixGestureDetector.decomposeToValues(
-                                            matrix)
-                                        .scale;
-                                ref.read(databaseProvider)?.createMap(
-                                    x,
-                                    y,
-                                    zoom,
-                                    authState.whenOrNull(
-                                        data: (user) => user.id)!);
-                              }),
-                              backgroundColor: state ? Colors.blue : null)
-                          : const Text(""),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      FloatingActionButton(
-                          heroTag: null,
-                          child: !state
-                              ? const Icon(Icons.edit)
-                              : const Icon(Icons.close),
-                          onPressed: (() {
-                            ref
-                                .read(isEditProvider.notifier)
-                                .update((state) => !state);
+                            ref.read(databaseProvider)?.createMap(
+                                map2?['x'],
+                                map2?['y'],
+                                map2?['zoom'],
+                                authState.whenOrNull(data: (user) => user.id)!);
+                            isDialogOpen.value = false;
                           }),
-                          backgroundColor: state ? Colors.red : null),
+                      SpeedDialChild(
+                          onTap: () {
+                            List<TableModel> _toSave =
+                                tables.where((i) => i.isEdit).toList();
+                            for (var t in _toSave) {
+                              var data = {"x": t.vector!.x, "y": t.vector!.y};
+                              ref
+                                  .read(databaseProvider)
+                                  ?.editTable(t.idF!, data);
+                            }
+                            Navigator.push(context, HeroDialogRoute(
+                                builder: (BuildContext context) {
+                              return TableDialogWidget(
+                                table: TableModel(),
+                                heroTag: "table",
+                                isNew: true,
+                              );
+                            })).whenComplete(
+                                () => ref.read(isOpenDialog).value = true);
+                            // isDialogOpen.value = false;
+                          },
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: Colors.black),
                     ],
                   );
+
+                  // Column(
+                  //   mainAxisAlignment: MainAxisAlignment.end,
+                  //   children: [
+                  //     state
+                  //         ? FloatingActionButton(
+                  //             heroTag: null,
+                  //             child: const Icon(Icons.add),
+                  //             onPressed: (() {
+                  //               AutoRouter.of(context).navigateNamed("login");
+                  //             }),
+                  //             backgroundColor: state ? Colors.black : null)
+                  //         : const Text(""),
+                  //     const SizedBox(
+                  //       height: 10,
+                  //     ),
+                  //     state
+                  //         ? FloatingActionButton(
+                  //             heroTag: null,
+                  //             child: const Icon(Icons.save),
+                  //             onPressed: (() {
+                  //               List<TableModel> _toSave =
+                  //                   tables.where((i) => i.isEdit).toList();
+                  //               for (var t in _toSave) {
+                  //                 ref.read(databaseProvider)?.editTablePosition(
+                  //                     t.idF!, t.vector!.x, t.vector!.y);
+                  //               }
+                  //               ref
+                  //                   .read(isEditProvider.notifier)
+                  //                   .update((state) => !state);
+
+                  //               double x = matrix.getTranslation().x;
+                  //               double y = matrix.getTranslation().y;
+
+                  //               double zoom =
+                  //                   MatrixGestureDetector.decomposeToValues(
+                  //                           matrix)
+                  //                       .scale;
+                  //               ref.read(databaseProvider)?.createMap(
+                  //                   x,
+                  //                   y,
+                  //                   zoom,
+                  //                   authState.whenOrNull(
+                  //                       data: (user) => user.id)!);
+                  //             }),
+                  //             backgroundColor: state ? Colors.blue : null)
+                  //         : const Text(""),
+                  //     const SizedBox(
+                  //       height: 10,
+                  //     ),
+                  //     FloatingActionButton(
+                  //         heroTag: null,
+                  //         child: !state
+                  //             ? const Icon(Icons.edit)
+                  //             : const Icon(Icons.close),
+                  //         onPressed: (() {
+                  //           ref
+                  //               .read(isEditProvider.notifier)
+                  //               .update((state) => !state);
+                  //         }),
+                  //         backgroundColor: state ? Colors.red : null),
+                  //   ],
+                  // );
                 } else {
                   return Column();
                 }

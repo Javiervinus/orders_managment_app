@@ -44,6 +44,8 @@ dependencies:
   cloud_firestore: ^3.1.13
   matrix_gesture_detector: ^0.2.0-nullsafety.1
   vector_math: ^2.1.2
+  custom_sliding_segmented_control: ^1.7.1 
+  flutter_speed_dial: ^6.0.0
 
 dev_dependencies:
   flutter_test:

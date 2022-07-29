@@ -36,5 +36,5 @@ class HeroDialogRoute<T> extends PageRoute<T> {
 
   @override
   // TODO: implement barrierLabel
-  String? get barrierLabel => "table2";
+  String? get barrierLabel => "widget";
 }
