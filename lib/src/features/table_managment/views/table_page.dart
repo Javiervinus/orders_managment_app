@@ -137,6 +137,9 @@ class _TablePageState extends ConsumerState<TablePage> {
                                 map2?['zoom'],
                                 authState.whenOrNull(data: (user) => user.id)!);
                             isDialogOpen.value = false;
+                            ref
+                                .read(isEditProvider.notifier)
+                                .update((state) => false);
                           }),
                       SpeedDialChild(
                           onTap: () {
