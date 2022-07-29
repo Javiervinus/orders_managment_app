@@ -101,7 +101,7 @@ class _TablePageState extends ConsumerState<TablePage> {
                 if (value.user.isWaiter == null) {
                   return SpeedDial(
                     openCloseDial: isDialogOpen,
-                    closeManually: false,
+                    closeManually: true,
                     animatedIcon: AnimatedIcons.menu_close,
                     backgroundColor: Colors.black,
                     activeBackgroundColor: Colors.red,
@@ -122,6 +122,9 @@ class _TablePageState extends ConsumerState<TablePage> {
                           ),
                           backgroundColor: Colors.blue,
                           onTap: () {
+                            ref
+                                .refresh(isEditProvider.notifier)
+                                .update((state) => false);
                             List<TableModel> _toSave =
                                 tables.where((i) => i.isEdit).toList();
                             for (var t in _toSave) {
@@ -137,9 +140,6 @@ class _TablePageState extends ConsumerState<TablePage> {
                                 map2?['zoom'],
                                 authState.whenOrNull(data: (user) => user.id)!);
                             isDialogOpen.value = false;
-                            ref
-                                .read(isEditProvider.notifier)
-                                .update((state) => false);
                           }),
                       SpeedDialChild(
                           onTap: () {
